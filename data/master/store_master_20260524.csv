@@ -1,0 +1,11 @@
+store_code,store_name,area_code,area_name,is_active
+"001","Tokyo ","A001","Kanto",1
+"002","Kanagawa","A001","Kanto",1
+"003","Saitama","A001","Kanto",1
+"004","Oosaka","B001","Kansai",1
+"005","Kyoto","B001","Kansai",1
+"006","Hyogo","B001","Kansai",1
+"007","Hukuoka","C001","Kyushu",1
+"008","Kumamoto","C001","Kyushu",1
+"009","Kagoshima","C001","Kyushu",1
+
