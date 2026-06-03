@@ -1,8 +1,16 @@
-from app.config import INPUT_DIR
-from app.csv_loader import load_csv
+from app.master_loader import (
+    load_store_master,
+    load_area_master,
+    load_cost_master,
+    load_tax_rate_master,
+)
 
-csv_path = INPUT_DIR / "sales_001_202606_20260524_091533.csv"
+store_master = load_store_master()
+area_master = load_area_master()
+cost_master = load_cost_master()
+tax_rate_master = load_tax_rate_master()
 
-df = load_csv(csv_path)
-
-print(df.head())
+print(store_master.head())
+print(area_master.head())
+print(cost_master.head())
+print(tax_rate_master.head())
