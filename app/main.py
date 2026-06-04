@@ -1,16 +1,11 @@
-from app.master_loader import (
-    load_store_master,
-    load_area_master,
-    load_cost_master,
-    load_tax_rate_master,
-)
+from app.validator import validate_input_files, validate_master_files
 
-store_master = load_store_master()
-area_master = load_area_master()
-cost_master = load_cost_master()
-tax_rate_master = load_tax_rate_master()
+target_month = "202606"
 
-print(store_master.head())
-print(area_master.head())
-print(cost_master.head())
-print(tax_rate_master.head())
+csv_files = validate_input_files(target_month)
+validate_master_files()
+
+print("入力CSVチェックOK")
+print(csv_files)
+
+print("マスタファイルチェックOK")
