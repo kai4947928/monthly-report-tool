@@ -12,6 +12,7 @@ def validate_input_files(target_month):
 
     return csv_files
 
+
 def validate_master_files():
     required_files = [
         "store_master_20260524.csv",
