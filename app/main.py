@@ -1,18 +1,23 @@
-from app.config import INPUT_DIR, MASTER_DIR
-from app.csv_loader import load_csv
+from app.csv_loader import load_monthly_sales_csv
+from app.master_loader import load_tax_rate_master, load_cost_master
 from app.aggregator import aggregate_store_data
 
 
-target_month = "202606"
-csv_path = INPUT_DIR / target_month / "sales_001_202606_20260524_091533.csv"
-csv_tax_rate_master_path = MASTER_DIR / "tax_rate_master_20260529.csv"
-cost_master_path = MASTER_DIR / "cost_master_20260529.csv"
+def main():
+    target_month = "202606"
 
-sales_df = load_csv(csv_path)
-tax_rate_master_df = load_csv(csv_tax_rate_master_path)
-cost_master_df = load_csv(cost_master_path)
+    monthly_sales_df = load_monthly_sales_csv(target_month)
+    tax_rate_master_df = load_tax_rate_master()
+    cost_master_df = load_cost_master()
 
-result = aggregate_store_data(sales_df, tax_rate_master_df, cost_master_df)
+    grouped = monthly_sales_df.groupby("store_code")
 
-print(result)
+    for store_code, store_df in grouped:
+        result = aggregate_store_data(store_df, tax_rate_master_df, cost_master_df)
 
+        print(f"店舗コード: {store_code}")
+        print(result)
+        print("_" * 30)
+
+if __name__ == "__main__":
+    main()
