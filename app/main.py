@@ -1,8 +1,8 @@
 from app.config import TEMPLATE_DIR, OUTPUT_DIR
 from app.csv_loader import load_monthly_sales_csv
 from app.master_loader import load_tax_rate_master, load_cost_master, load_store_master
-from app.aggregator import aggregate_overall_data, aggregate_store_data
-from app.report_writer import write_overall_report, write_store_report
+from app.aggregator import aggregate_overall_data, aggregate_store_data, aggregate_area_data
+from app.report_writer import write_overall_report, write_store_report, write_area_report
 
 
 def main():
@@ -96,8 +96,40 @@ def main():
             output_path,
         )
 
-        print(store_code)
-        print(type(store_code))
+        sales_with_store_df = monthly_sales_df.merge(
+            store_master_df,
+            on="store_code",
+            how="left",
+        )
+
+        grouped = sales_with_store_df.groupby("area_code")
+
+        for area_code, area_df in grouped:
+            result = aggregate_area_data(area_df, tax_rate_master_df, cost_master_df)
+
+            area_name = area_df["area_name"].iloc[0]
+
+            area_output_dir = (
+                OUTPUT_DIR / target_month / "areas" / f"{area_name}エリア_{target_month}_月次報告書"
+            )
+
+            area_output_dir.mkdir(
+                parents=True,
+                exist_ok=True,
+            )
+
+            output_path = (
+                area_output_dir / f"{target_month}_{area_code}_{area_name}_月次報告書.xlsx"
+            )
+
+            write_area_report(
+                result,
+                target_month,
+                area_code,
+                area_name,
+                template_path,
+                output_path,
+            )
 
 if __name__ == "__main__":
     main()
