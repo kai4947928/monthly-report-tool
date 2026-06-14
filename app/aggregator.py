@@ -99,7 +99,9 @@ def aggregate_area_data(area_df, tax_rate_master_df, cost_master_df):
 
     cost_amount = 0
     labor_cost_amount = 0
-    expense_amount = 0
+    rent_cost = 0
+    utility_cost = 0
+    other_expense_cost = 0
 
     grouped = area_df.groupby("store_code")
 
@@ -112,29 +114,36 @@ def aggregate_area_data(area_df, tax_rate_master_df, cost_master_df):
 
         cost_rate = store_cost["cost_rate"].iloc[0]
         labor_cost_rate = store_cost["labor_cost_rate"].iloc[0]
-        rent_cost = store_cost["rent_cost"].iloc[0]
-        utility_cost = store_cost["utility_cost"].iloc[0]
-        other_expense_cost = store_cost["other_expense_cost"].iloc[0]
+
+        rent_cost += store_cost["rent_cost"].iloc[0]
+        utility_cost += store_cost["utility_cost"].iloc[0]
+        other_expense_cost += store_cost["other_expense_cost"].iloc[0]
 
         cost_amount += store_sales_amount_tax_ex * cost_rate
         labor_cost_amount += store_sales_amount_tax_ex * labor_cost_rate
-        expense_amount += rent_cost + utility_cost + other_expense_cost
 
-    gross_profit = sales_amount_tax_ex - cost_amount
-
-    net_profit = (
-        sales_amount_tax_ex - cost_amount - labor_cost_amount - expense_amount
+    operating_profit = (
+        sales_amount_tax_ex
+        - cost_amount
+        - labor_cost_amount
+        - rent_cost
+        - utility_cost
+        - other_expense_cost
     )
 
     if sales_amount_tax_ex == 0:
-        profit_rate = 0
+        cost_rate = 0
+        labor_cost_rate = 0
+        operating_profit_rate = 0
     else:
-        profit_rate = net_profit / sales_amount_tax_ex * 100
+        cost_rate = cost_amount / sales_amount_tax_ex * 100
+        labor_cost_rate = labor_cost_amount / sales_amount_tax_ex * 100
+        operating_profit_rate = operating_profit / sales_amount_tax_ex * 100
 
     result = {
-        "sales_amount_tax_in": sales_amount_tax_in,
         "sales_amount_tax_ex": sales_amount_tax_ex,
         "tax_amount": tax_amount,
+        "sales_amount_tax_in": sales_amount_tax_in,
         "customer_count": customer_count,
         "average_spend": average_spend,
         "tax_rate": active_tax_rate,
@@ -143,13 +152,14 @@ def aggregate_area_data(area_df, tax_rate_master_df, cost_master_df):
         "rent_cost": rent_cost,
         "utility_cost": utility_cost,
         "other_expense_cost": other_expense_cost,
-        "operating_profit": net_profit,
-        "cost_rate": cost_rate * 100,
-        "labor_cost_rate": labor_cost_rate * 100,
-        "operating_profit_rate": profit_rate,
+        "operating_profit": operating_profit,
+        "cost_rate": cost_rate,
+        "labor_cost_rate": labor_cost_rate,
+        "operating_profit_rate": operating_profit_rate,
     }
 
     return result
+
 
 def aggregate_overall_data(monthly_sales_df, tax_rate_master_df, cost_master_df):
     sales_amount_tax_ex = monthly_sales_df["sales_amount_tax_ex"].sum()
