@@ -69,10 +69,13 @@ def aggregate_store_data(sales_df, tax_rate_master_df, cost_master_df):
         "tax_rate": active_tax_rate,
         "cost_amount": cost_amount,
         "labor_cost_amount": labor_cost_amount,
-        "expense_amount": expense_amount,
-        "gross_profit": gross_profit,
-        "net_profit": net_profit,
-        "profit_rate": profit_rate,
+        "rent_cost": rent_cost,
+        "utility_cost": utility_cost,
+        "other_expense_cost": other_expense_cost,
+        "operating_profit": net_profit,
+        "cost_rate": cost_rate * 100,
+        "labor_cost_rate": labor_cost_rate * 100,
+        "operating_profit_rate": profit_rate,
     }
 
     return result
@@ -137,10 +140,13 @@ def aggregate_area_data(area_df, tax_rate_master_df, cost_master_df):
         "tax_rate": active_tax_rate,
         "cost_amount": cost_amount,
         "labor_cost_amount": labor_cost_amount,
-        "expense_amount": expense_amount,
-        "gross_profit": gross_profit,
-        "net_profit": net_profit,
-        "profit_rate": profit_rate,
+        "rent_cost": rent_cost,
+        "utility_cost": utility_cost,
+        "other_expense_cost": other_expense_cost,
+        "operating_profit": net_profit,
+        "cost_rate": cost_rate * 100,
+        "labor_cost_rate": labor_cost_rate * 100,
+        "operating_profit_rate": profit_rate,
     }
 
     return result
