@@ -99,7 +99,9 @@ def aggregate_area_data(area_df, tax_rate_master_df, cost_master_df):
 
     cost_amount = 0
     labor_cost_amount = 0
-    expense_amount = 0
+    rent_cost = 0
+    utility_cost = 0
+    other_expense_cost = 0
 
     grouped = area_df.groupby("store_code")
 
@@ -112,18 +114,15 @@ def aggregate_area_data(area_df, tax_rate_master_df, cost_master_df):
 
         cost_rate = store_cost["cost_rate"].iloc[0]
         labor_cost_rate = store_cost["labor_cost_rate"].iloc[0]
-        rent_cost = store_cost["rent_cost"].iloc[0]
-        utility_cost = store_cost["utility_cost"].iloc[0]
-        other_expense_cost = store_cost["other_expense_cost"].iloc[0]
+        rent_cost += store_cost["rent_cost"].iloc[0]
+        utility_cost += store_cost["utility_cost"].iloc[0]
+        other_expense_cost += store_cost["other_expense_cost"].iloc[0]
 
         cost_amount += store_sales_amount_tax_ex * cost_rate
         labor_cost_amount += store_sales_amount_tax_ex * labor_cost_rate
-        expense_amount += rent_cost + utility_cost + other_expense_cost
-
-    gross_profit = sales_amount_tax_ex - cost_amount
 
     net_profit = (
-        sales_amount_tax_ex - cost_amount - labor_cost_amount - expense_amount
+        sales_amount_tax_ex - cost_amount - labor_cost_amount - rent_cost - utility_cost - other_expense_cost
     )
 
     if sales_amount_tax_ex == 0:
