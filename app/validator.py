@@ -28,3 +28,13 @@ def validate_master_files():
             raise FileNotFoundError(f"マスタファイルが存在しません: {file_path}")
 
     return True
+
+def validate_required_columns(df, required_columns):
+    missing_columns = (
+        required_columns - set(df.columns)
+    )
+
+    if missing_columns:
+        raise ValueError(
+            f"必須カラム不足: {missing_columns}"
+        )
