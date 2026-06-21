@@ -3,7 +3,7 @@ from app.csv_loader import load_monthly_sales_csv
 from app.master_loader import (load_tax_rate_master, load_cost_master, load_store_master)
 from app.aggregator import (aggregate_overall_data, aggregate_store_data, aggregate_area_data)
 from app.report_writer import (write_overall_report, write_store_report, write_area_report)
-from app.validator import validate_required_columns
+from app.validator import validate_required_columns, validate_target_month
 from app.validation_rules import (MONTHLY_SALES_REQUIRED_COLUMNS, STORE_MASTER_REQUIRED_COLUMNS, COST_MASTER_REQUIRED_COLUMNS, TAX_RATE_MASTER_REQUIRED_COLUMNS)
 
 def main():
@@ -27,6 +27,8 @@ def main():
     validate_required_columns(tax_rate_master_df, TAX_RATE_MASTER_REQUIRED_COLUMNS)
 
     template_path = (TEMPLATE_DIR / "monthly_report_format_20260529.xlsx")
+
+    validate_target_month(monthly_sales_df, target_month)
 
     # =====================
     # 全体報告書
