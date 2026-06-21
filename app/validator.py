@@ -1,3 +1,4 @@
+import pandas as pd
 from app.config import INPUT_DIR, MASTER_DIR
 
 def validate_input_files(target_month):
@@ -38,3 +39,14 @@ def validate_required_columns(df, required_columns):
         raise ValueError(
             f"必須カラム不足: {missing_columns}"
         )
+
+def validate_target_month(df, target_month):
+    business_dates = pd.to_datetime(df["business_date"])
+
+    actual_months = business_dates.dt.strftime("%Y%m").unique()
+
+    if actual_months[0] != target_month or len(actual_months) != 1:
+        raise ValueError(
+            f"対象月不一致: target_month={target_month}, actual_months={actual_months}"
+        )
+

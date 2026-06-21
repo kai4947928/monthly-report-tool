@@ -1,7 +1,7 @@
 import pandas as pd
 import pytest
 
-from app.validator import validate_required_columns
+from app.validator import validate_required_columns, validate_target_month
 
 def test_validate_required_columns_success():
 
@@ -40,3 +40,37 @@ def test_validate_required_columns_error():
 
     with pytest.raises(ValueError):
         validate_required_columns(df, required_columns)
+
+def test_validate_target_month_success():
+    target_month = "202606"
+
+    df = pd.DataFrame([
+        {"business_date": "2026-06-01"},
+        {"business_date": "2026-06-02"},
+        {"business_date": "2026-06-03"},
+        {"business_date": "2026-06-04"},
+    ])
+
+    validate_target_month(df, target_month)
+
+def test_validate_target_month_error_mixed():
+    target_month = "202606"
+
+    df = pd.DataFrame([
+        {"business_date": "2026-06-01"},
+        {"business_date": "2026-07-01"},
+    ])
+
+    with pytest.raises(ValueError):
+        validate_target_month(df, target_month)
+
+def test_validate_target_month_error_wrong():
+    target_month = "202606"
+
+    df = pd.DataFrame([
+        {"business_date": "2026-07-01"},
+        {"business_date": "2026-07-02"},
+    ])
+
+    with pytest.raises(ValueError):
+        validate_target_month(df, target_month)
