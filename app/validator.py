@@ -50,3 +50,14 @@ def validate_target_month(df, target_month):
             f"対象月不一致: target_month={target_month}, actual_months={actual_months}"
         )
 
+def validate_store_count(monthly_sales_df, store_master_df):
+    sales_store_count = len(monthly_sales_df["store_code"].unique())
+
+    active_store_df = store_master_df[store_master_df["is_active"] == True]
+
+    master_store_count = len(active_store_df)
+
+    if sales_store_count != master_store_count:
+        raise ValueError(
+            f"店舗数不一致: sales_store_count={sales_store_count}, master_store_count{master_store_count}"
+        )
