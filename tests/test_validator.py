@@ -1,7 +1,7 @@
 import pandas as pd
 import pytest
 
-from app.validator import validate_required_columns, validate_target_month
+from app.validator import validate_required_columns, validate_target_month, validate_store_count
 
 def test_validate_required_columns_success():
 
@@ -74,3 +74,73 @@ def test_validate_target_month_error_wrong():
 
     with pytest.raises(ValueError):
         validate_target_month(df, target_month)
+
+def test_validate_store_count_success():
+    monthly_sales_df = pd.DataFrame([
+        {"store_code": "001"},
+        {"store_code": "002"},
+        {"store_code": "003"},
+        {"store_code": "004"},
+        {"store_code": "005"},
+        {"store_code": "006"},
+        {"store_code": "007"},
+        {"store_code": "008"},
+        {"store_code": "009"},
+    ])
+
+    store_master_df = pd.DataFrame([
+        {"store_code": "001", "is_active": True},
+        {"store_code": "002", "is_active": True},
+        {"store_code": "003", "is_active": True},
+        {"store_code": "004", "is_active": True},
+        {"store_code": "005", "is_active": True},
+        {"store_code": "006", "is_active": True},
+        {"store_code": "007", "is_active": True},
+        {"store_code": "008", "is_active": True},
+        {"store_code": "009", "is_active": True},
+    ])
+
+
+    validate_store_count(monthly_sales_df, store_master_df)
+
+def test_validate_store_count_error_more():
+    monthly_sales_df = pd.DataFrame([
+        {"store_code": "001"},
+        {"store_code": "002"},
+        {"store_code": "003"},
+        {"store_code": "004"},
+        {"store_code": "005"},
+    ])
+
+    store_master_df = pd.DataFrame([
+        {"store_code": "001", "is_active": True},
+        {"store_code": "002", "is_active": True},
+        {"store_code": "003", "is_active": True},
+        {"store_code": "004", "is_active": True},
+    ])
+
+    with pytest.raises(ValueError):
+        validate_store_count(monthly_sales_df, store_master_df)
+
+def test_validate_store_count_error_less():
+    monthly_sales_df = pd.DataFrame([
+        {"store_code": "001"},
+        {"store_code": "002"},
+        {"store_code": "003"},
+        {"store_code": "004"},
+        {"store_code": "005"},
+        {"store_code": "006"},
+    ])
+
+    store_master_df = pd.DataFrame([
+        {"store_code": "001", "is_active": True},
+        {"store_code": "002", "is_active": True},
+        {"store_code": "003", "is_active": True},
+        {"store_code": "004", "is_active": True},
+        {"store_code": "005", "is_active": True},
+        {"store_code": "006", "is_active": True},
+        {"store_code": "007", "is_active": True},
+    ])
+
+    with pytest.raises(ValueError):
+        validate_store_count(monthly_sales_df, store_master_df)
