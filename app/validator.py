@@ -61,3 +61,27 @@ def validate_store_count(monthly_sales_df, store_master_df):
         raise ValueError(
             f"店舗数不一致: sales_store_count={sales_store_count}, master_store_count{master_store_count}"
         )
+
+def validate_store_codes(monthly_sales_df, store_master_df):
+    sales_store_codes = (
+        monthly_sales_df["store_code"].unique()
+    )
+
+    active_store_df = store_master_df[
+        store_master_df["is_active"] == True
+    ]
+
+    active_store_codes = (
+        active_store_df["store_code"].unique()
+    )
+
+    invalid_store_codes = []
+
+    for code in sales_store_codes:
+        if code not in active_store_codes:
+            invalid_store_codes.append(code)
+
+    if invalid_store_codes:
+        raise ValueError(
+            f"存在しない店舗コードがあります: {invalid_store_codes}"
+        )
