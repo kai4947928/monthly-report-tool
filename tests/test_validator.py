@@ -1,7 +1,7 @@
 import pandas as pd
 import pytest
 
-from app.validator import validate_required_columns, validate_target_month, validate_store_count
+from app.validator import validate_required_columns, validate_target_month, validate_store_count, validate_store_codes
 
 def test_validate_required_columns_success():
 
@@ -144,3 +144,43 @@ def test_validate_store_count_error_less():
 
     with pytest.raises(ValueError):
         validate_store_count(monthly_sales_df, store_master_df)
+
+def test_validate_store_codes_success():
+    monthly_sales_df = pd.DataFrame([
+        {"store_code": "001"},
+        {"store_code": "002"},
+        {"store_code": "003"},
+        {"store_code": "004"},
+        {"store_code": "005"},
+    ])
+
+    store_master_df = pd.DataFrame([
+        {"store_code": "001", "is_active": True},
+        {"store_code": "002", "is_active": True},
+        {"store_code": "003", "is_active": True},
+        {"store_code": "004", "is_active": True},
+        {"store_code": "005", "is_active": True},
+    ])
+
+    validate_store_codes(monthly_sales_df, store_master_df)
+
+def test_validate_store_codes_error():
+    monthly_sales_df = pd.DataFrame([
+        {"store_code": "001"},
+        {"store_code": "002"},
+        {"store_code": "003"},
+        {"store_code": "004"},
+        {"store_code": "005"},
+        {"store_code": "999"},
+    ])
+
+    store_master_df = pd.DataFrame([
+        {"store_code": "001", "is_active": True},
+        {"store_code": "002", "is_active": True},
+        {"store_code": "003", "is_active": True},
+        {"store_code": "004", "is_active": True},
+        {"store_code": "005", "is_active": True},
+    ])
+
+    with pytest.raises(ValueError):
+        validate_store_codes(monthly_sales_df, store_master_df)
