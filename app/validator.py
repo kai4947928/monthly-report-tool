@@ -13,7 +13,6 @@ def validate_input_files(target_month):
 
     return csv_files
 
-
 def validate_master_files():
     required_files = [
         "store_master_20260524.csv",
@@ -84,4 +83,20 @@ def validate_store_codes(monthly_sales_df, store_master_df):
     if invalid_store_codes:
         raise ValueError(
             f"存在しない店舗コードがあります: {invalid_store_codes}"
+        )
+
+def validate_csv_count(csv_files, store_master_df):
+    active_store_df = store_master_df[
+        store_master_df["is_active"] == True
+    ]
+
+    master_store_count = len(active_store_df)
+
+    csv_count = len(csv_files)
+
+    if csv_count != master_store_count:
+        raise ValueError(
+            f"CSVファイル数不一致: "
+            f"csv_count={csv_count},"
+            f"master_store_count={master_store_count}"
         )
