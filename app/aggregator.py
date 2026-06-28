@@ -214,4 +214,3 @@ def aggregate_overall_data(monthly_sales_df, tax_rate_master_df, cost_master_df)
 
     return result
 
-

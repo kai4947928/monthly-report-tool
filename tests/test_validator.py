@@ -1,7 +1,7 @@
 import pandas as pd
 import pytest
 
-from app.validator import validate_required_columns, validate_target_month, validate_store_count, validate_store_codes
+from app.validator import validate_required_columns, validate_target_month, validate_store_count, validate_store_codes, validate_csv_count
 
 def test_validate_required_columns_success():
 
@@ -184,3 +184,52 @@ def test_validate_store_codes_error():
 
     with pytest.raises(ValueError):
         validate_store_codes(monthly_sales_df, store_master_df)
+
+def test_validate_csv_count_success():
+    csv_files = [
+        "001.csv",
+        "002.csv",
+        "003.csv",
+    ]
+
+    store_master_df = pd.DataFrame([
+        {"store_code": "001", "is_active": True},
+        {"store_code": "002", "is_active": True},
+        {"store_code": "003", "is_active": True},
+    ])
+
+    validate_csv_count(csv_files, store_master_df)
+
+def test_validate_csv_count_error_more():
+    csv_files = [
+        "001.csv",
+        "002.csv",
+        "003.csv",
+        "004.csv",
+    ]
+
+    store_master_df = pd.DataFrame([
+        {"store_code": "001", "is_active": True},
+        {"store_code": "002", "is_active": True},
+        {"store_code": "003", "is_active": True},
+    ])
+
+    with pytest.raises(ValueError):
+        validate_csv_count(csv_files, store_master_df)
+
+def test_validate_csv_count_error_less():
+    csv_files = [
+        "001.csv",
+        "002.csv",
+        "003.csv",
+    ]
+
+    store_master_df = pd.DataFrame([
+        {"store_code": "001", "is_active": True},
+        {"store_code": "002", "is_active": True},
+        {"store_code": "003", "is_active": True},
+        {"store_code": "004", "is_active": True},
+    ])
+
+    with pytest.raises(ValueError):
+        validate_csv_count(csv_files, store_master_df)
