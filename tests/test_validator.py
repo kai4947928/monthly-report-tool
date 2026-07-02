@@ -1,7 +1,7 @@
 import pandas as pd
 import pytest
 
-from app.validator import validate_required_columns, validate_target_month, validate_store_count, validate_store_codes, validate_csv_count
+from app.validator import validate_required_columns, validate_target_month, validate_store_count, validate_store_codes, validate_csv_count, validate_business_date_complete
 
 def test_validate_required_columns_success():
 
@@ -233,3 +233,45 @@ def test_validate_csv_count_error_less():
 
     with pytest.raises(ValueError):
         validate_csv_count(csv_files, store_master_df)
+
+def test_validate_business_date_complete_success():
+    target_month = "202606"
+
+    start_date = pd.to_datetime(target_month + "01")
+    end_date = start_date + pd.offsets.MonthEnd(0)
+    expected_dates = set(pd.date_range(start=start_date, end=end_date))
+
+    records = []
+
+    for date in expected_dates:
+        records.append({
+            "store_code": "001",
+            "business_date": date,
+        })
+
+    monthly_sales_df = pd.DataFrame(records)
+
+    validate_business_date_complete(monthly_sales_df, target_month)
+
+def test_validate_business_date_complete_error_missing_date():
+    target_month = "202606"
+
+    start_date = pd.to_datetime(target_month + "01")
+    end_date = start_date + pd.offsets.MonthEnd(0)
+    expected_dates = pd.date_range(start=start_date, end=end_date)
+
+    records = []
+
+    missing_date = pd.to_datetime("2026-06-15")
+    for date in expected_dates:
+        if date == missing_date:
+            continue
+        records.append({
+            "store_code": "001",
+            "business_date": date,
+        })
+
+    monthly_sales_df = pd.DataFrame(records)
+
+    with pytest.raises(ValueError):
+        validate_business_date_complete(monthly_sales_df, target_month)

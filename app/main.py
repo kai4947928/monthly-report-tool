@@ -3,7 +3,7 @@ from app.csv_loader import load_monthly_sales_csv
 from app.master_loader import (load_tax_rate_master, load_cost_master, load_store_master)
 from app.aggregator import (aggregate_overall_data, aggregate_store_data, aggregate_area_data)
 from app.report_writer import (write_overall_report, write_store_report, write_area_report)
-from app.validator import validate_required_columns, validate_target_month, validate_store_count, validate_store_codes, validate_csv_count
+from app.validator import validate_required_columns, validate_target_month, validate_store_count, validate_store_codes, validate_csv_count, validate_business_date_complete
 from app.validation_rules import (MONTHLY_SALES_REQUIRED_COLUMNS, STORE_MASTER_REQUIRED_COLUMNS, COST_MASTER_REQUIRED_COLUMNS, TAX_RATE_MASTER_REQUIRED_COLUMNS)
 
 def main():
@@ -39,6 +39,8 @@ def main():
     validate_store_codes(monthly_sales_df, store_master_df)
 
     validate_csv_count(csv_files, store_master_df)
+
+    validate_business_date_complete(monthly_sales_df, target_month)
 
     # =====================
     # 全体報告書
@@ -95,6 +97,8 @@ def main():
         output_path = (area_output_dir / f"{area_name}エリア_{target_month}_月次報告書.xlsx")
 
         write_area_report(result, target_month, area_code, area_name, template_path, output_path)
+
+        print(f"{target_month}の月次報告書作成が正常に完了しました。")
 
 if __name__ == "__main__":
     main()

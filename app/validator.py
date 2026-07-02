@@ -100,3 +100,29 @@ def validate_csv_count(csv_files, store_master_df):
             f"csv_count={csv_count},"
             f"master_store_count={master_store_count}"
         )
+
+def validate_business_date_complete(monthly_sales_df, target_month):
+    start_date = pd.to_datetime(target_month + "01")
+    end_date = start_date + pd.offsets.MonthEnd(0)
+    expected_dates = set(pd.date_range(start=start_date, end=end_date))
+
+    validation_errors = []
+
+    for store_code, store_df in monthly_sales_df.groupby("store_code"):
+        actual_dates = set(
+            pd.to_datetime(store_df["business_date"])
+        )
+
+        missing_dates = expected_dates - actual_dates
+        if missing_dates:
+            validation_errors.append(
+                {
+                    "store_code": store_code,
+                    "missing_dates": sorted(missing_dates)
+                }
+            )
+
+    if validation_errors:
+        raise ValueError(
+            f"日付不一致: {validation_errors}"
+        )
