@@ -27,7 +27,8 @@ from app.validator import (
     validate_csv_count,
     validate_business_date_complete,
     validate_area_codes,
-    validate_area_count
+    validate_area_count,
+    validate_null_check
 )
 
 from app.validation_rules import (
@@ -77,6 +78,8 @@ def main():
     validate_area_codes(store_master_df, area_master_df)
 
     validate_area_count(area_master_df, store_master_df)
+
+    validate_null_check(monthly_sales_df)
 
     # =====================
     # 全体報告書
