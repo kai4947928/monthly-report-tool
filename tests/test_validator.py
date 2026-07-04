@@ -1,7 +1,15 @@
 import pandas as pd
 import pytest
 
-from app.validator import validate_required_columns, validate_target_month, validate_store_count, validate_store_codes, validate_csv_count, validate_business_date_complete
+from app.validator import (
+    validate_required_columns,
+    validate_target_month,
+    validate_store_count,
+    validate_store_codes,
+    validate_csv_count,
+    validate_business_date_complete,
+    validate_area_codes
+)
 
 def test_validate_required_columns_success():
 
@@ -275,3 +283,49 @@ def test_validate_business_date_complete_error_missing_date():
 
     with pytest.raises(ValueError):
         validate_business_date_complete(monthly_sales_df, target_month)
+
+def test_validate_area_codes_success():
+    monthly_sales_df = pd.DataFrame([
+        {"area_code": "A"},
+        {"area_code": "B"},
+        {"area_code": "C"},
+    ])
+
+    area_master_df = pd.DataFrame([
+        {"area_code": "A", "is_active": True},
+        {"area_code": "B", "is_active": True},
+        {"area_code": "C", "is_active": True},
+    ])
+
+    validate_area_codes(monthly_sales_df, area_master_df)
+
+def test_validate_area_codes_error_inactive():
+    monthly_sales_df = pd.DataFrame([
+        {"area_code": "A"},
+        {"area_code": "B"},
+        {"area_code": "C"},
+    ])
+
+    area_master_df = pd.DataFrame([
+        {"area_code": "A", "is_active": True},
+        {"area_code": "B", "is_active": True},
+        {"area_code": "C", "is_active": False},
+    ])
+
+    with pytest.raises(ValueError):
+        validate_area_codes(monthly_sales_df, area_master_df)
+
+def test_validate_area_codes_error_not_found():
+    monthly_sales_df = pd.DataFrame([
+        {"area_code": "A"},
+        {"area_code": "B"},
+        {"area_code": "C"},
+    ])
+
+    area_master_df = pd.DataFrame([
+        {"area_code": "A", "is_active": True},
+        {"area_code": "B", "is_active": True},
+    ])
+
+    with pytest.raises(ValueError):
+        validate_area_codes(monthly_sales_df, area_master_df)
