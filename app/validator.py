@@ -153,3 +153,16 @@ def validate_area_count(area_master_df, store_master_df):
             f"有効エリア数={active_area_count}, "
             f"使用エリア数={used_area_count}"
         )
+
+def validate_null_check(monthly_sales_df):
+    required_not_null_columns = [
+        "store_code",
+        "business_date",
+        "sales_amount_tax_ex",
+        "customer_count"
+    ]
+
+    if monthly_sales_df[required_not_null_columns].isnull().any().any():
+        raise ValueError(
+            "必須項目にNULLが存在します"
+        )

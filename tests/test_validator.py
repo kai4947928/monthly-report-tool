@@ -9,7 +9,8 @@ from app.validator import (
     validate_csv_count,
     validate_business_date_complete,
     validate_area_codes,
-    validate_area_count
+    validate_area_count,
+    validate_null_check
 )
 
 def test_validate_required_columns_success():
@@ -364,3 +365,24 @@ def test_validate_area_count_error():
 
     with pytest.raises(ValueError):
         validate_area_count(area_master_df, store_master_df)
+
+def test_validate_null_check_success():
+    monthly_sales_df = pd.DataFrame([
+        {"store_code": "001",
+        "business_date": "2026-07-05",
+        "sales_amount_tax_ex": 1000000,
+        "customer_count": 500}
+    ])
+
+    validate_null_check(monthly_sales_df)
+
+def test_validate_null_check_error():
+    monthly_sales_df = pd.DataFrame([
+        {"store_code": "001",
+        "business_date": "2026-07-05",
+        "sales_amount_tax_ex": 1000000,
+        "customer_count": pd.NA}
+    ])
+
+    with pytest.raises(ValueError):
+        validate_null_check(monthly_sales_df)
