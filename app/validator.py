@@ -141,3 +141,15 @@ def validate_area_codes(store_master_df, area_master_df):
         raise ValueError(
             f"エリアコード不一致: {sorted(invalid_area_codes)}"
         )
+
+def validate_area_count(area_master_df, store_master_df):
+    active_area_count = area_master_df.loc[area_master_df["is_active"] == True, "area_code"].nunique()
+
+    used_area_count = store_master_df["area_code"].nunique()
+
+    if active_area_count != used_area_count:
+        raise ValueError(
+            f"エリア数が一致しません: "
+            f"有効エリア数={active_area_count}, "
+            f"使用エリア数={used_area_count}"
+        )

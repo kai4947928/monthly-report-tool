@@ -26,7 +26,8 @@ from app.validator import (
     validate_store_codes,
     validate_csv_count,
     validate_business_date_complete,
-    validate_area_codes
+    validate_area_codes,
+    validate_area_count
 )
 
 from app.validation_rules import (
@@ -74,6 +75,8 @@ def main():
     validate_business_date_complete(monthly_sales_df, target_month)
 
     validate_area_codes(store_master_df, area_master_df)
+
+    validate_area_count(area_master_df, store_master_df)
 
     # =====================
     # 全体報告書
@@ -131,7 +134,7 @@ def main():
 
         write_area_report(result, target_month, area_code, area_name, template_path, output_path)
 
-        print(f"{target_month}の月次報告書作成が正常に完了しました。")
+    print(f"{target_month}の月次報告書作成が正常に完了しました。")
 
 if __name__ == "__main__":
     main()
