@@ -126,3 +126,18 @@ def validate_business_date_complete(monthly_sales_df, target_month):
         raise ValueError(
             f"日付不一致: {validation_errors}"
         )
+
+def validate_area_codes(store_master_df, area_master_df):
+    csv_area_codes = set(store_master_df["area_code"])
+
+    active_area_df = area_master_df[
+        area_master_df["is_active"] == True
+    ]
+    master_area_codes = set(active_area_df["area_code"])
+
+    invalid_area_codes = csv_area_codes - master_area_codes
+
+    if invalid_area_codes:
+        raise ValueError(
+            f"エリアコード不一致: {sorted(invalid_area_codes)}"
+        )

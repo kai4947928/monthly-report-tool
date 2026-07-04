@@ -1,10 +1,40 @@
 from app.config import TEMPLATE_DIR, OUTPUT_DIR, INPUT_DIR
 from app.csv_loader import load_monthly_sales_csv
-from app.master_loader import (load_tax_rate_master, load_cost_master, load_store_master)
-from app.aggregator import (aggregate_overall_data, aggregate_store_data, aggregate_area_data)
-from app.report_writer import (write_overall_report, write_store_report, write_area_report)
-from app.validator import validate_required_columns, validate_target_month, validate_store_count, validate_store_codes, validate_csv_count, validate_business_date_complete
-from app.validation_rules import (MONTHLY_SALES_REQUIRED_COLUMNS, STORE_MASTER_REQUIRED_COLUMNS, COST_MASTER_REQUIRED_COLUMNS, TAX_RATE_MASTER_REQUIRED_COLUMNS)
+from app.master_loader import (
+    load_tax_rate_master,
+    load_cost_master,
+    load_store_master,
+    load_area_master
+)
+
+from app.aggregator import (
+    aggregate_overall_data,
+    aggregate_store_data,
+    aggregate_area_data
+)
+
+from app.report_writer import (
+    write_overall_report,
+    write_store_report,
+    write_area_report
+)
+
+from app.validator import (
+    validate_required_columns,
+    validate_target_month,
+    validate_store_count,
+    validate_store_codes,
+    validate_csv_count,
+    validate_business_date_complete,
+    validate_area_codes
+)
+
+from app.validation_rules import (
+    MONTHLY_SALES_REQUIRED_COLUMNS,
+    STORE_MASTER_REQUIRED_COLUMNS,
+    COST_MASTER_REQUIRED_COLUMNS,
+    TAX_RATE_MASTER_REQUIRED_COLUMNS
+)
 
 def main():
     target_month = "202606"
@@ -17,6 +47,7 @@ def main():
     tax_rate_master_df = load_tax_rate_master()
     cost_master_df = load_cost_master()
     store_master_df = load_store_master()
+    area_master_df = load_area_master()
 
     # =====================
     # バリデーション
@@ -41,6 +72,8 @@ def main():
     validate_csv_count(csv_files, store_master_df)
 
     validate_business_date_complete(monthly_sales_df, target_month)
+
+    validate_area_codes(store_master_df, area_master_df)
 
     # =====================
     # 全体報告書
