@@ -29,7 +29,8 @@ from app.validator import (
     validate_area_codes,
     validate_area_count,
     validate_null_check,
-    validate_numeric_check
+    validate_numeric_check,
+    validate_duplicate_data_check
 )
 
 from app.validation_rules import (
@@ -83,6 +84,8 @@ def main():
     validate_null_check(monthly_sales_df)
 
     validate_numeric_check(monthly_sales_df)
+
+    validate_duplicate_data_check(monthly_sales_df)
 
     # =====================
     # 全体報告書

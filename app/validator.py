@@ -183,3 +183,11 @@ def validate_numeric_check(monthly_sales_df):
             raise ValueError(
                 f"数値項目 {column} に不正な値が存在します。"
             )
+
+def validate_duplicate_data_check(monthly_sales_df):
+    if monthly_sales_df.duplicated(
+        subset=["store_code", "business_date"]
+    ).any():
+        raise ValueError(
+            "同一店舗・同一営業日の重複データが存在します。"
+        )
