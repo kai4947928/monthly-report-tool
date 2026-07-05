@@ -11,7 +11,8 @@ from app.validator import (
     validate_area_codes,
     validate_area_count,
     validate_null_check,
-    validate_numeric_check
+    validate_numeric_check,
+    validate_duplicate_data_check
 )
 
 def test_validate_required_columns_success():
@@ -402,3 +403,24 @@ def test_validate_numeric_check_error():
 
     with pytest.raises(ValueError, match="数値項目 customer_count に不正な値が存在します。"):
         validate_numeric_check(monthly_sales_df)
+
+def test_validate_duplicate_check_success():
+    monthly_sales_df = pd.DataFrame([
+        {"store_code": "001", "business_date": "2026-06-05"},
+        {"store_code": "001", "business_date": "2026-06-06"},
+        {"store_code": "002", "business_date": "2026-06-05"},
+        {"store_code": "002", "business_date": "2026-06-06"}
+    ])
+
+    validate_duplicate_data_check(monthly_sales_df)
+
+def test_validate_duplicate_check_error():
+    monthly_sales_df = pd.DataFrame([
+        {"store_code": "001", "business_date": "2026-06-05"},
+        {"store_code": "001", "business_date": "2026-06-05"},
+        {"store_code": "002", "business_date": "2026-06-05"},
+        {"store_code": "002", "business_date": "2026-06-05"}
+    ])
+
+    with pytest.raises(ValueError, match="同一店舗・同一営業日の重複データが存在します。"):
+        validate_duplicate_data_check(monthly_sales_df)
