@@ -166,3 +166,20 @@ def validate_null_check(monthly_sales_df):
         raise ValueError(
             "必須項目にNULLが存在します"
         )
+
+def validate_numeric_check(monthly_sales_df):
+    numeric_columns = [
+        "sales_amount_tax_ex",
+        "customer_count"
+    ]
+
+    for column in numeric_columns:
+        try:
+            pd.to_numeric(
+                monthly_sales_df[column],
+                errors="raise"
+            )
+        except ValueError:
+            raise ValueError(
+                f"数値項目 {column} に不正な値が存在します。"
+            )

@@ -10,7 +10,8 @@ from app.validator import (
     validate_business_date_complete,
     validate_area_codes,
     validate_area_count,
-    validate_null_check
+    validate_null_check,
+    validate_numeric_check
 )
 
 def test_validate_required_columns_success():
@@ -386,3 +387,18 @@ def test_validate_null_check_error():
 
     with pytest.raises(ValueError):
         validate_null_check(monthly_sales_df)
+
+def test_validate_numeric_check_success():
+    monthly_sales_df = pd.DataFrame([
+        {"sales_amount_tax_ex": 1000000, "customer_count": 500},
+    ])
+
+    validate_numeric_check(monthly_sales_df)
+
+def test_validate_numeric_check_error():
+    monthly_sales_df = pd.DataFrame([
+        {"sales_amount_tax_ex": 1000000, "customer_count": "五百"},
+    ])
+
+    with pytest.raises(ValueError, match="数値項目 customer_count に不正な値が存在します。"):
+        validate_numeric_check(monthly_sales_df)
