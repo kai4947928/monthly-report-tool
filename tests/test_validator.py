@@ -12,7 +12,8 @@ from app.validator import (
     validate_area_count,
     validate_null_check,
     validate_numeric_check,
-    validate_duplicate_data_check
+    validate_duplicate_data_check,
+    validate_tax_rate_period
 )
 
 def test_validate_required_columns_success():
@@ -424,3 +425,59 @@ def test_validate_duplicate_check_error():
 
     with pytest.raises(ValueError, match="同一店舗・同一営業日の重複データが存在します。"):
         validate_duplicate_data_check(monthly_sales_df)
+
+def test_validate_tax_rate_period_success():
+    target_month = "202606"
+
+    tax_rate_master_df = pd.DataFrame([
+        {
+            "tax_rate": "0.08",
+            "valid_from": "2014-04-01",
+            "valid_to": "2019-09-30"
+        },
+        {
+            "tax_rate": "0.10",
+            "valid_from": "2019-10-01",
+            "valid_to": "2099-12-31"
+        }
+    ])
+
+    validate_tax_rate_period(tax_rate_master_df, target_month)
+
+def test_validate_tax_rate_period_error():
+    target_month = "202606"
+
+    tax_rate_master_df = pd.DataFrame([
+        {
+            "tax_rate": "0.08",
+            "valid_from": "2014-04-01",
+            "valid_to": "2019-09-30"
+        },
+        {
+            "tax_rate": "0.10",
+            "valid_from": "2019-10-01",
+            "valid_to": "2025-09-30"
+        }
+    ])
+
+    with pytest.raises(ValueError, match="対象月に適用できる税率を取得できません"):
+        validate_tax_rate_period(tax_rate_master_df, target_month)
+
+def test_validate_tax_rate_period_error_overlapping():
+    target_month = "202606"
+
+    tax_rate_master_df = pd.DataFrame([
+        {
+            "tax_rate": "0.08",
+            "valid_from": "2019-10-01",
+            "valid_to": "2026-09-30"
+        },
+        {
+            "tax_rate": "0.10",
+            "valid_from": "2019-10-01",
+            "valid_to": "2026-09-30"
+        }
+    ])
+
+    with pytest.raises(ValueError, match="対象月に適用できる税率を取得できません"):
+        validate_tax_rate_period(tax_rate_master_df, target_month)

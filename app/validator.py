@@ -191,3 +191,23 @@ def validate_duplicate_data_check(monthly_sales_df):
         raise ValueError(
             "同一店舗・同一営業日の重複データが存在します。"
         )
+
+def validate_tax_rate_period(tax_rate_master_df, target_month):
+    target_date = pd.to_datetime(target_month + "01")
+
+    tax_rate_master_df["valid_from"] = pd.to_datetime(
+        tax_rate_master_df["valid_from"]
+    )
+
+    tax_rate_master_df["valid_to"] = pd.to_datetime(
+        tax_rate_master_df["valid_to"]
+    )
+
+    valid_tax_rate_df = tax_rate_master_df[
+        (tax_rate_master_df["valid_from"] <= target_date) & (tax_rate_master_df["valid_to"] >= target_date)
+    ]
+
+    if len(valid_tax_rate_df) != 1:
+        raise ValueError(
+            "対象月に適用できる税率を取得できません"
+        )

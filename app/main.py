@@ -30,7 +30,8 @@ from app.validator import (
     validate_area_count,
     validate_null_check,
     validate_numeric_check,
-    validate_duplicate_data_check
+    validate_duplicate_data_check,
+    validate_tax_rate_period
 )
 
 from app.validation_rules import (
@@ -86,6 +87,8 @@ def main():
     validate_numeric_check(monthly_sales_df)
 
     validate_duplicate_data_check(monthly_sales_df)
+
+    validate_tax_rate_period(tax_rate_master_df, target_month)
 
     # =====================
     # 全体報告書
