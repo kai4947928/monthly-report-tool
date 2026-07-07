@@ -483,7 +483,7 @@ def test_validate_tax_rate_period_error_overlapping():
     with pytest.raises(ValueError, match="対象月に適用できる税率を取得できません"):
         validate_tax_rate_period(tax_rate_master_df, target_month)
 
-def test_validate_cost_master_check():
+def test_validate_cost_master_check_success():
     store_master_df = pd.DataFrame([
         {"store_code": "001"},
         {"store_code": "002"},
@@ -497,3 +497,19 @@ def test_validate_cost_master_check():
     ])
 
     validate_cost_master_check(store_master_df, cost_master_df)
+
+def test_validate_cost_master_check_error():
+    store_master_df = pd.DataFrame([
+        {"store_code": "001"},
+        {"store_code": "002"},
+        {"store_code": "003"},
+    ])
+
+    cost_master_df = pd.DataFrame([
+        {"store_code": "001"},
+        {"store_code": "002"},
+        {"store_code": "004"},
+    ])
+
+    with pytest.raises(ValueError, match="店舗マスタと原価マスタの店舗コードが一致しません"):
+        validate_cost_master_check(store_master_df, cost_master_df)
