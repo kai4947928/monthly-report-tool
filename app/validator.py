@@ -211,3 +211,12 @@ def validate_tax_rate_period(tax_rate_master_df, target_month):
         raise ValueError(
             "対象月に適用できる税率を取得できません"
         )
+
+def validate_cost_master_check(store_master_df, cost_master_df):
+    store_codes = set(store_master_df["store_code"])
+    cost_store_codes = set(cost_master_df["store_code"])
+
+    if store_codes != cost_store_codes:
+        raise ValueError(
+            "店舗マスタと原価マスタの店舗コードが一致しません"
+        )
