@@ -31,10 +31,6 @@ def aggregate_store_data(sales_df, tax_rate_master_df, cost_master_df):
         rent_cost + utility_cost + other_expense_cost
     )
 
-    gross_profit = (
-        sales_amount_tax_ex - cost_amount
-    )
-
     net_profit = (
         sales_amount_tax_ex - cost_amount - labor_cost_amount - expense_amount
     )
