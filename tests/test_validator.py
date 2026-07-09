@@ -1,5 +1,6 @@
 import pandas as pd
 import pytest
+import openpyxl
 
 from app.validator import (
     validate_required_columns,
@@ -15,6 +16,7 @@ from app.validator import (
     validate_duplicate_data_check,
     validate_tax_rate_period,
     validate_cost_master_check,
+    validate_report_output_cells
 )
 
 def test_validate_required_columns_success():
@@ -513,3 +515,90 @@ def test_validate_cost_master_check_error():
 
     with pytest.raises(ValueError, match="店舗マスタと原価マスタの店舗コードが一致しません"):
         validate_cost_master_check(store_master_df, cost_master_df)
+
+def test_validate_report_output_cells_success(tmp_path):
+    aggregation_result = {
+        "sales_amount_tax_ex": 1000000,
+        "tax_amount": 100000,
+        "sales_amount_tax_in": 1100000,
+        "customer_count": 500,
+        "average_spend": 2200,
+        "tax_rate": 0.10,
+        "cost_amount": 300000,
+        "labor_cost_amount": 250000,
+        "rent_cost": 100000,
+        "utility_cost": 50000,
+        "other_expense_cost": 30000,
+        "operating_profit": 270000,
+        "cost_rate": 0.30,
+        "labor_cost_rate": 0.25,
+        "operating_profit_rate": 0.27
+    }
+
+    workbook = openpyxl.Workbook()
+    worksheet = workbook.active
+
+    worksheet["B7"].value = 1000000
+    worksheet["D7"].value = 100000
+    worksheet["F7"].value = 1100000
+    worksheet["B10"].value = 500
+    worksheet["D10"].value = 2200
+    worksheet["F10"].value = 0.10
+    worksheet["B13"].value = 300000
+    worksheet["D13"].value = 250000
+    worksheet["F13"].value = 100000
+    worksheet["B16"].value = 50000
+    worksheet["D16"].value = 30000
+    worksheet["F16"].value = 270000
+    worksheet["B19"].value = 0.30
+    worksheet["D19"].value = 0.25
+    worksheet["F19"].value = 0.27
+
+    output_path = tmp_path / "test_report.xlsx"
+    workbook.save(output_path)
+
+    validate_report_output_cells(output_path, aggregation_result)
+
+def test_validate_report_output_cells_error(tmp_path):
+    aggregation_result = {
+        "sales_amount_tax_ex": 1000000,
+        "tax_amount": 100000,
+        "sales_amount_tax_in": 1100000,
+        "customer_count": 500,
+        "average_spend": 2200,
+        "tax_rate": 0.10,
+        "cost_amount": 300000,
+        "labor_cost_amount": 250000,
+        "rent_cost": 100000,
+        "utility_cost": 50000,
+        "other_expense_cost": 30000,
+        "operating_profit": 270000,
+        "cost_rate": 0.30,
+        "labor_cost_rate": 0.25,
+        "operating_profit_rate": 0.27
+    }
+
+    workbook = openpyxl.Workbook()
+    worksheet = workbook.active
+
+    worksheet["B7"].value = 10000
+    worksheet["D7"].value = 100000
+    worksheet["F7"].value = 1200000
+    worksheet["B10"].value = 500
+    worksheet["D10"].value = 2200
+    worksheet["F10"].value = 0.10
+    worksheet["B13"].value = 300000
+    worksheet["D13"].value = 250000
+    worksheet["F13"].value = 100000
+    worksheet["B16"].value = 50000
+    worksheet["D16"].value = 350000
+    worksheet["F16"].value = 270000
+    worksheet["B19"].value = 0.30
+    worksheet["D19"].value = 0.25
+    worksheet["F19"].value = 0.27
+
+    output_path = tmp_path / "test_report.xlsx"
+    workbook.save(output_path)
+
+    with pytest.raises(ValueError):
+        validate_report_output_cells(output_path, aggregation_result)

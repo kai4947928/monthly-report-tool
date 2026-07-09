@@ -32,7 +32,8 @@ from app.validator import (
     validate_numeric_check,
     validate_duplicate_data_check,
     validate_tax_rate_period,
-    validate_cost_master_check
+    validate_cost_master_check,
+    validate_report_output_cells
 )
 
 from app.validation_rules import (
@@ -149,6 +150,7 @@ def main():
 
         write_area_report(result, target_month, area_code, area_name, template_path, output_path)
 
+    validate_report_output_cells(output_path, result)
     print(f"{target_month}の月次報告書作成が正常に完了しました。")
 
 if __name__ == "__main__":

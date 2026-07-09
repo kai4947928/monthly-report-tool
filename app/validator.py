@@ -1,4 +1,5 @@
 import pandas as pd
+import openpyxl
 from app.config import INPUT_DIR, MASTER_DIR
 
 def validate_input_files(target_month):
@@ -220,3 +221,34 @@ def validate_cost_master_check(store_master_df, cost_master_df):
         raise ValueError(
             "店舗マスタと原価マスタの店舗コードが一致しません"
         )
+
+def validate_report_output_cells(output_path, aggregation_result):
+    workbook = openpyxl.load_workbook(output_path)
+    worksheet = workbook.active
+
+    cell_mapping = {
+        "sales_amount_tax_ex": "B7",
+        "tax_amount": "D7",
+        "sales_amount_tax_in": "F7",
+        "customer_count": "B10",
+        "average_spend": "D10",
+        "tax_rate": "F10",
+        "cost_amount": "B13",
+        "labor_cost_amount": "D13",
+        "rent_cost": "F13",
+        "utility_cost": "B16",
+        "other_expense_cost": "D16",
+        "operating_profit": "F16",
+        "cost_rate": "B19",
+        "labor_cost_rate": "D19",
+        "operating_profit_rate": "F19"
+    }
+
+    for key, cell in cell_mapping.items():
+        expected_value = aggregation_result[key]
+        actual_value = worksheet[cell].value
+
+        if round(expected_value, 2) != round(actual_value, 2):
+            raise ValueError(
+                f"出力セル {cell} の値が集計結果と一致しません"
+            )
