@@ -16,10 +16,10 @@ def validate_input_files(target_month):
 
 def validate_master_files():
     required_files = [
-        "store_master_20260524.csv",
-        "area_master_20260524.csv",
-        "cost_master_20260529.csv",
-        "tax_rate_master_20260529.csv",
+        "store_master.csv",
+        "area_master.csv",
+        "cost_master.csv",
+        "tax_rate_master.csv",
     ]
 
     for file_name in required_files:
@@ -227,21 +227,22 @@ def validate_report_output_cells(output_path, aggregation_result):
     worksheet = workbook.active
 
     cell_mapping = {
-        "sales_amount_tax_ex": "B7",
-        "tax_amount": "D7",
-        "sales_amount_tax_in": "F7",
-        "customer_count": "B10",
-        "average_spend": "D10",
-        "tax_rate": "F10",
-        "cost_amount": "B13",
-        "labor_cost_amount": "D13",
-        "rent_cost": "F13",
-        "utility_cost": "B16",
-        "other_expense_cost": "D16",
-        "operating_profit": "F16",
-        "cost_rate": "B19",
-        "labor_cost_rate": "D19",
-        "operating_profit_rate": "F19"
+        "sales_amount_tax_ex": "B6",
+        "tax_amount": "D6",
+        "sales_amount_tax_in": "F6",
+        "customer_count": "B9",
+        "average_customer_spend": "D9",
+        "tax_rate": "F9",
+        "cost_amount": "B12",
+        "labor_cost_amount": "D12",
+        "rent_cost": "F12",
+        "utility_cost": "B15",
+        "other_expense_cost": "D15",
+        "operating_cost": "F15",
+        "operating_profit": "B18",
+        "cost_rate": "D18",
+        "labor_cost_rate": "F18",
+        "operating_profit_rate": "B21",
     }
 
     for key, cell in cell_mapping.items():
