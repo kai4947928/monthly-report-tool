@@ -68,7 +68,7 @@ def main():
 
     validate_required_columns(tax_rate_master_df, TAX_RATE_MASTER_REQUIRED_COLUMNS)
 
-    template_path = (TEMPLATE_DIR / "monthly_report_format_20260529.xlsx")
+    template_path = (TEMPLATE_DIR / "monthly_report_format.xlsx")
 
     validate_target_month(monthly_sales_df, target_month)
 
@@ -94,28 +94,9 @@ def main():
 
     validate_cost_master_check(store_master_df, cost_master_df)
 
-    # =====================
-    # 全体報告書
-    # =====================
-
-    overall_result = aggregate_overall_data(monthly_sales_df, tax_rate_master_df, cost_master_df)
-
-    overall_output_dir = (OUTPUT_DIR / target_month / "all")
-
-    overall_output_dir.mkdir(parents=True, exist_ok=True)
-
-    overall_output_path = (overall_output_dir / f"{target_month}_全体月次報告書.xlsx")
-
-    write_overall_report(overall_result, target_month, template_path, overall_output_path)
-
-    # =====================
     # 店舗報告書
-    # =====================
-
-    grouped = monthly_sales_df.groupby("store_code")
-
-    for store_code, store_df in grouped:
-        result = aggregate_store_data(store_df, tax_rate_master_df, cost_master_df)
+    for store_code, store_df in monthly_sales_df.groupby("store_code"):
+        store_summary = aggregate_store_data(store_df, tax_rate_master_df, cost_master_df)
 
         store_info = store_master_df.loc[store_master_df["store_code"] == store_code]
 
@@ -125,20 +106,22 @@ def main():
 
         store_output_dir.mkdir(parents=True, exist_ok=True)
 
-        output_path = (store_output_dir / f"{target_month}_{store_code}_{store_name}_月次報告書.xlsx")
+        store_output_path = (store_output_dir / f"{target_month}_{store_code}_{store_name}_月次報告書.xlsx")
 
-        write_store_report(result, target_month, store_code, store_name, template_path, output_path)
+        write_store_report(store_summary, target_month, store_code, store_name, template_path, store_output_path)
 
-    # =====================
+        validate_report_output_cells(store_output_path, store_summary)
+
     # エリア報告書
-    # =====================
-
     sales_with_store_df = monthly_sales_df.merge(store_master_df, on="store_code", how="left")
 
-    grouped = sales_with_store_df.groupby("area_code")
+    area_summaries = []
 
-    for area_code, area_df in grouped:
-        result = aggregate_area_data(area_df, tax_rate_master_df, cost_master_df)
+    for area_code, area_df in sales_with_store_df.groupby("area_code"):
+        area_summary = aggregate_area_data(area_df, tax_rate_master_df, cost_master_df)
+
+        area_summary["area_code"] = area_code
+        area_summaries.append(area_summary)
 
         area_name = area_df["area_name"].iloc[0]
 
@@ -146,11 +129,25 @@ def main():
 
         area_output_dir.mkdir(parents=True, exist_ok=True)
 
-        output_path = (area_output_dir / f"{area_name}エリア_{target_month}_月次報告書.xlsx")
+        area_output_path = (area_output_dir / f"{area_name}エリア_{target_month}_月次報告書.xlsx")
 
-        write_area_report(result, target_month, area_code, area_name, template_path, output_path)
+        write_area_report(area_summary, target_month, area_code, area_name, template_path, area_output_path)
 
-    validate_report_output_cells(output_path, result)
+        validate_report_output_cells(area_output_path, area_summary)
+
+    # 全体報告書
+    overall_summary = aggregate_overall_data(area_summaries)
+
+    overall_output_dir = (OUTPUT_DIR / target_month / "all")
+
+    overall_output_dir.mkdir(parents=True, exist_ok=True)
+
+    overall_output_path = (overall_output_dir / f"{target_month}_全体月次報告書.xlsx")
+
+    write_overall_report(overall_summary, target_month, template_path, overall_output_path)
+
+    validate_report_output_cells(overall_output_path, overall_summary)
+
     print(f"{target_month}の月次報告書作成が正常に完了しました。")
 
 if __name__ == "__main__":

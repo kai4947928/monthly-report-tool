@@ -522,42 +522,56 @@ def test_validate_report_output_cells_success(tmp_path):
         "tax_amount": 100000,
         "sales_amount_tax_in": 1100000,
         "customer_count": 500,
-        "average_spend": 2200,
+        "average_customer_spend": 2200,
         "tax_rate": 0.10,
         "cost_amount": 300000,
         "labor_cost_amount": 250000,
         "rent_cost": 100000,
         "utility_cost": 50000,
         "other_expense_cost": 30000,
+        "operating_cost": 430000,
         "operating_profit": 270000,
-        "cost_rate": 0.30,
-        "labor_cost_rate": 0.25,
-        "operating_profit_rate": 0.27
+        "cost_rate": 30.0,
+        "labor_cost_rate": 25.0,
+        "operating_profit_rate": 27.0,
     }
 
     workbook = openpyxl.Workbook()
     worksheet = workbook.active
 
-    worksheet["B7"].value = 1000000
-    worksheet["D7"].value = 100000
-    worksheet["F7"].value = 1100000
-    worksheet["B10"].value = 500
-    worksheet["D10"].value = 2200
-    worksheet["F10"].value = 0.10
-    worksheet["B13"].value = 300000
-    worksheet["D13"].value = 250000
-    worksheet["F13"].value = 100000
-    worksheet["B16"].value = 50000
-    worksheet["D16"].value = 30000
-    worksheet["F16"].value = 270000
-    worksheet["B19"].value = 0.30
-    worksheet["D19"].value = 0.25
-    worksheet["F19"].value = 0.27
+    # 売上情報
+    worksheet["B6"] = 1000000
+    worksheet["D6"] = 100000
+    worksheet["F6"] = 1100000
+
+    # 顧客・税率情報
+    worksheet["B9"] = 500
+    worksheet["D9"] = 2200
+    worksheet["F9"] = 0.10
+
+    # コスト情報
+    worksheet["B12"] = 300000
+    worksheet["D12"] = 250000
+    worksheet["F12"] = 100000
+
+    worksheet["B15"] = 50000
+    worksheet["D15"] = 30000
+    worksheet["F15"] = 430000
+
+    # 利益・比率情報
+    worksheet["B18"] = 270000
+    worksheet["D18"] = 30.0
+    worksheet["F18"] = 25.0
+
+    worksheet["B21"] = 27.0
 
     output_path = tmp_path / "test_report.xlsx"
     workbook.save(output_path)
 
-    validate_report_output_cells(output_path, aggregation_result)
+    validate_report_output_cells(
+        output_path,
+        aggregation_result,
+    )
 
 def test_validate_report_output_cells_error(tmp_path):
     aggregation_result = {
@@ -565,40 +579,54 @@ def test_validate_report_output_cells_error(tmp_path):
         "tax_amount": 100000,
         "sales_amount_tax_in": 1100000,
         "customer_count": 500,
-        "average_spend": 2200,
+        "average_customer_spend": 2200,
         "tax_rate": 0.10,
         "cost_amount": 300000,
         "labor_cost_amount": 250000,
         "rent_cost": 100000,
         "utility_cost": 50000,
         "other_expense_cost": 30000,
+        "operating_cost": 430000,
         "operating_profit": 270000,
-        "cost_rate": 0.30,
-        "labor_cost_rate": 0.25,
-        "operating_profit_rate": 0.27
+        "cost_rate": 30.0,
+        "labor_cost_rate": 25.0,
+        "operating_profit_rate": 27.0,
     }
 
     workbook = openpyxl.Workbook()
     worksheet = workbook.active
 
-    worksheet["B7"].value = 10000
-    worksheet["D7"].value = 100000
-    worksheet["F7"].value = 1200000
-    worksheet["B10"].value = 500
-    worksheet["D10"].value = 2200
-    worksheet["F10"].value = 0.10
-    worksheet["B13"].value = 300000
-    worksheet["D13"].value = 250000
-    worksheet["F13"].value = 100000
-    worksheet["B16"].value = 50000
-    worksheet["D16"].value = 350000
-    worksheet["F16"].value = 270000
-    worksheet["B19"].value = 0.30
-    worksheet["D19"].value = 0.25
-    worksheet["F19"].value = 0.27
+    # 売上情報（ここだけ不一致）
+    worksheet["B6"] = 999999
+    worksheet["D6"] = 100000
+    worksheet["F6"] = 1100000
+
+    # 顧客・税率情報
+    worksheet["B9"] = 500
+    worksheet["D9"] = 2200
+    worksheet["F9"] = 0.10
+
+    # コスト情報
+    worksheet["B12"] = 300000
+    worksheet["D12"] = 250000
+    worksheet["F12"] = 100000
+
+    worksheet["B15"] = 50000
+    worksheet["D15"] = 30000
+    worksheet["F15"] = 430000
+
+    # 利益・比率情報
+    worksheet["B18"] = 270000
+    worksheet["D18"] = 30.0
+    worksheet["F18"] = 25.0
+
+    worksheet["B21"] = 27.0
 
     output_path = tmp_path / "test_report.xlsx"
     workbook.save(output_path)
 
-    with pytest.raises(ValueError):
+    with pytest.raises(
+        ValueError,
+        match="出力セル B6 の値が集計結果と一致しません",
+    ):
         validate_report_output_cells(output_path, aggregation_result)
