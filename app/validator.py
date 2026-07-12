@@ -1,5 +1,6 @@
 import pandas as pd
 import openpyxl
+import math
 from app.config import INPUT_DIR, MASTER_DIR
 
 def validate_input_files(target_month):
@@ -252,4 +253,38 @@ def validate_report_output_cells(output_path, aggregation_result):
         if round(expected_value, 2) != round(actual_value, 2):
             raise ValueError(
                 f"出力セル {cell} の値が集計結果と一致しません"
+            )
+
+def validate_store_area_consistency(area_store_summaries, area_summary):
+    check_keys = [
+        "sales_amount_tax_ex",
+        "tax_amount",
+        "sales_amount_tax_in",
+        "customer_count",
+        "cost_amount",
+        "labor_cost_amount",
+        "rent_cost",
+        "utility_cost",
+        "other_expense_cost",
+        "operating_cost",
+        "operating_profit"
+    ]
+
+    for key in check_keys:
+        store_total = sum(
+            store_summary[key]
+            for store_summary in area_store_summaries
+        )
+
+        area_total = area_summary[key]
+
+        if not math.isclose(
+            store_total,
+            area_total,
+            rel_tol=1e-9,
+            abs_tol=0.01
+        ):
+            raise ValueError(
+                f"{key}: 店舗集計結果とエリア集計結果が一致しません。"
+                f"(店舗合計={store_total}, エリア集計={area_total})"
             )

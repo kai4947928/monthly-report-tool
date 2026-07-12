@@ -33,7 +33,8 @@ from app.validator import (
     validate_duplicate_data_check,
     validate_tax_rate_period,
     validate_cost_master_check,
-    validate_report_output_cells
+    validate_report_output_cells,
+    validate_store_area_consistency
 )
 
 from app.validation_rules import (
@@ -95,30 +96,72 @@ def main():
     validate_cost_master_check(store_master_df, cost_master_df)
 
     # 店舗報告書
-    for store_code, store_df in monthly_sales_df.groupby("store_code"):
-        store_summary = aggregate_store_data(store_df, tax_rate_master_df, cost_master_df)
+    store_summaries = []
 
-        store_info = store_master_df.loc[store_master_df["store_code"] == store_code]
+    for store_code, store_df in monthly_sales_df.groupby("store_code"):
+        store_summary = aggregate_store_data(
+            store_df,
+            tax_rate_master_df,
+            cost_master_df
+        )
+
+        store_info = store_master_df.loc[
+            store_master_df["store_code"] == store_code
+        ]
+
+        store_summary["area_code"] = store_info["area_code"].iloc[0]
+        store_summaries.append(store_summary)
 
         store_name = store_info["store_name"].iloc[0]
 
-        store_output_dir = (OUTPUT_DIR / target_month / "stores" / f"{store_code}_{store_name}")
+        store_output_dir = (
+            OUTPUT_DIR / target_month / "stores" / f"{store_code}_{store_name}"
+        )
 
-        store_output_dir.mkdir(parents=True, exist_ok=True)
+        store_output_dir.mkdir(
+            parents=True,
+            exist_ok=True
+        )
 
-        store_output_path = (store_output_dir / f"{target_month}_{store_code}_{store_name}_月次報告書.xlsx")
+        store_output_path = (
+            store_output_dir / f"{target_month}_{store_code}_{store_name}_月次報告書.xlsx"
+        )
 
-        write_store_report(store_summary, target_month, store_code, store_name, template_path, store_output_path)
+        write_store_report(
+            store_summary,
+            target_month,
+            store_code,
+            store_name,
+            template_path,
+            store_output_path
+        )
 
-        validate_report_output_cells(store_output_path, store_summary)
+        validate_report_output_cells(
+            store_output_path,
+            store_summary
+        )
 
     # エリア報告書
     sales_with_store_df = monthly_sales_df.merge(store_master_df, on="store_code", how="left")
-
     area_summaries = []
-
     for area_code, area_df in sales_with_store_df.groupby("area_code"):
-        area_summary = aggregate_area_data(area_df, tax_rate_master_df, cost_master_df)
+        area_summary = aggregate_area_data(
+            area_df,
+            tax_rate_master_df,
+            cost_master_df
+        )
+
+        area_store_summaries = []
+        for store_summary in store_summaries:
+            store_area_code = store_summary["area_code"]
+
+            if store_area_code == area_code:
+                area_store_summaries.append(store_summary)
+
+        validate_store_area_consistency(
+            area_store_summaries,
+            area_summary
+        )
 
         area_summary["area_code"] = area_code
         area_summaries.append(area_summary)
