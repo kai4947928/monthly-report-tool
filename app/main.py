@@ -34,7 +34,8 @@ from app.validator import (
     validate_tax_rate_period,
     validate_cost_master_check,
     validate_report_output_cells,
-    validate_store_area_consistency
+    validate_store_area_consistency,
+    validate_area_overall_consistency
 )
 
 from app.validation_rules import (
@@ -180,6 +181,8 @@ def main():
 
     # 全体報告書
     overall_summary = aggregate_overall_data(area_summaries)
+
+    validate_area_overall_consistency(area_summaries, overall_summary)
 
     overall_output_dir = (OUTPUT_DIR / target_month / "all")
 

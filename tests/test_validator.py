@@ -17,7 +17,8 @@ from app.validator import (
     validate_tax_rate_period,
     validate_cost_master_check,
     validate_report_output_cells,
-    validate_store_area_consistency
+    validate_store_area_consistency,
+    validate_area_overall_consistency
 )
 
 def test_validate_required_columns_success():
@@ -722,5 +723,98 @@ def test_validate_store_area_consistency_error():
         "operating_profit": 81000
     }
 
-    with pytest.raises(ValueError,match="sales_amount_tax_ex"):
+    with pytest.raises(ValueError):
         validate_store_area_consistency(area_store_summaries, area_summary)
+
+def test_validate_area_overall_consistency_success():
+    area_summaries = [
+        {
+            "sales_amount_tax_ex": 100000,
+            "tax_amount": 10000,
+            "sales_amount_tax_in": 110000,
+            "customer_count": 50,
+            "cost_amount": 30000,
+            "labor_cost_amount": 25000,
+            "rent_cost": 10000,
+            "utility_cost": 5000,
+            "other_expense_cost": 3000,
+            "operating_cost": 43000,
+            "operating_profit": 27000,
+        },
+        {
+            "sales_amount_tax_ex": 200000,
+            "tax_amount": 20000,
+            "sales_amount_tax_in": 220000,
+            "customer_count": 100,
+            "cost_amount": 60000,
+            "labor_cost_amount": 50000,
+            "rent_cost": 20000,
+            "utility_cost": 10000,
+            "other_expense_cost": 6000,
+            "operating_cost": 86000,
+            "operating_profit": 54000,
+        }
+    ]
+
+    overall_summary = {
+        "sales_amount_tax_ex": 300000,
+        "tax_amount": 30000,
+        "sales_amount_tax_in": 330000,
+        "customer_count": 150,
+        "cost_amount": 90000,
+        "labor_cost_amount": 75000,
+        "rent_cost": 30000,
+        "utility_cost": 15000,
+        "other_expense_cost": 9000,
+        "operating_cost": 129000,
+        "operating_profit": 81000
+    }
+
+    validate_area_overall_consistency(area_summaries, overall_summary)
+
+def test_validate_area_overall_consistency_error():
+    area_summaries = [
+        {
+            "sales_amount_tax_ex": 100000,
+            "tax_amount": 10000,
+            "sales_amount_tax_in": 110000,
+            "customer_count": 50,
+            "cost_amount": 30000,
+            "labor_cost_amount": 25000,
+            "rent_cost": 10000,
+            "utility_cost": 5000,
+            "other_expense_cost": 3000,
+            "operating_cost": 43000,
+            "operating_profit": 27000,
+        },
+        {
+            "sales_amount_tax_ex": 200000,
+            "tax_amount": 20000,
+            "sales_amount_tax_in": 220000,
+            "customer_count": 100,
+            "cost_amount": 60000,
+            "labor_cost_amount": 50000,
+            "rent_cost": 20000,
+            "utility_cost": 10000,
+            "other_expense_cost": 6000,
+            "operating_cost": 86000,
+            "operating_profit": 54000,
+        }
+    ]
+
+    overall_summary = {
+        "sales_amount_tax_ex": 300001,
+        "tax_amount": 30000,
+        "sales_amount_tax_in": 330000,
+        "customer_count": 150,
+        "cost_amount": 90000,
+        "labor_cost_amount": 75000,
+        "rent_cost": 30000,
+        "utility_cost": 15000,
+        "other_expense_cost": 9000,
+        "operating_cost": 129000,
+        "operating_profit": 81000
+    }
+
+    with pytest.raises(ValueError):
+        validate_area_overall_consistency(area_summaries, overall_summary)

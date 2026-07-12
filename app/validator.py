@@ -288,3 +288,37 @@ def validate_store_area_consistency(area_store_summaries, area_summary):
                 f"{key}: 店舗集計結果とエリア集計結果が一致しません。"
                 f"(店舗合計={store_total}, エリア集計={area_total})"
             )
+
+def validate_area_overall_consistency(area_summaries, overall_summary):
+    check_keys = [
+        "sales_amount_tax_ex",
+        "tax_amount",
+        "sales_amount_tax_in",
+        "customer_count",
+        "cost_amount",
+        "labor_cost_amount",
+        "rent_cost",
+        "utility_cost",
+        "other_expense_cost",
+        "operating_cost",
+        "operating_profit"
+    ]
+
+    for key in check_keys:
+        area_total = sum(
+            area_summary[key]
+            for area_summary in area_summaries
+        )
+
+        overall_total = overall_summary[key]
+
+        if not math.isclose(
+            area_total,
+            overall_total,
+            rel_tol=1e-9,
+            abs_tol=0.01
+        ):
+            raise ValueError(
+                f"{key}: エリア集計結果と全体集計結果が一致しません。"
+                f"(エリア合計={area_total}, 全体集計={overall_total})"
+            )
