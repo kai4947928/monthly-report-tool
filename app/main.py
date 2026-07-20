@@ -1,3 +1,6 @@
+import argparse
+import re
+
 from app.config import TEMPLATE_DIR, OUTPUT_DIR, INPUT_DIR
 from app.csv_loader import load_monthly_sales_csv
 from app.master_loader import (
@@ -21,7 +24,7 @@ from app.report_writer import (
 
 from app.validator import (
     validate_required_columns,
-    validate_target_month,
+    validate_target_month as validate_sales_target_month,
     validate_store_count,
     validate_store_codes,
     validate_csv_count,
@@ -45,8 +48,37 @@ from app.validation_rules import (
     TAX_RATE_MASTER_REQUIRED_COLUMNS
 )
 
-def main():
-    target_month = "202606"
+def validate_target_month_argument(target_month: str) -> str:
+    """コマンドライン引数が有効なYYYYMM形式か検証する。"""
+    if re.fullmatch(r"\d{6}", target_month) is None:
+        raise argparse.ArgumentTypeError(
+            "対象年月は6桁のYYYYMM形式で指定してください（例: 202606）"
+        )
+
+    month = int(target_month[4:])
+    if not 1 <= month <= 12:
+        raise argparse.ArgumentTypeError(
+            "対象年月の月は01から12の範囲で指定してください"
+        )
+
+    return target_month
+
+
+def parse_arguments(arguments=None):
+    """月次報告書作成に必要なコマンドライン引数を取得する。"""
+    parser = argparse.ArgumentParser(description="月次報告書を作成します")
+    parser.add_argument(
+        "--target-month",
+        required=True,
+        type=validate_target_month_argument,
+        help="対象年月（YYYYMM形式）",
+    )
+    return parser.parse_args(arguments)
+
+
+def main(arguments=None):
+    command_line_arguments = parse_arguments(arguments)
+    target_month = command_line_arguments.target_month
 
     input_dir = INPUT_DIR / target_month
 
@@ -72,7 +104,7 @@ def main():
 
     template_path = (TEMPLATE_DIR / "monthly_report_format.xlsx")
 
-    validate_target_month(monthly_sales_df, target_month)
+    validate_sales_target_month(monthly_sales_df, target_month)
 
     validate_store_count(monthly_sales_df, store_master_df)
 
