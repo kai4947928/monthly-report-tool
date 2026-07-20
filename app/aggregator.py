@@ -1,3 +1,15 @@
+def calculate_rate(amount, sales_amount_tax_ex):
+    """売上に対する金額の比率を小数形式で計算する。
+
+    Excel側でパーセント表示するため、100は掛けない。
+    売上が0の場合は、既存の集計仕様に合わせて0を返す。
+    """
+    if sales_amount_tax_ex == 0:
+        return 0
+
+    return amount / sales_amount_tax_ex
+
+
 #店舗データ集計関数
 def aggregate_store_data(store_df, tax_rate_master_df, cost_master_df):
     #店舗の税抜合計
@@ -26,14 +38,12 @@ def aggregate_store_data(store_df, tax_rate_master_df, cost_master_df):
     #店舗の原価率を取得し、店舗の原価を集計
     cost_rate = store_cost["cost_rate"].iloc[0]
     cost_amount = sales_amount_tax_ex * cost_rate
-    cost_rate_percent = cost_rate * 100
 
     #店舗の人件費率を取得し、店舗の人件費を集計
     labor_cost_rate = store_cost["labor_cost_rate"].iloc[0]
     labor_cost_amount = (
         sales_amount_tax_ex * labor_cost_rate
     )
-    labor_cost_rate_percent = labor_cost_rate * 100
 
     #店舗の固定費を取得し、人件費を含めた店舗運営費用を集計
     rent_cost = store_cost["rent_cost"].iloc[0]
@@ -48,13 +58,13 @@ def aggregate_store_data(store_df, tax_rate_master_df, cost_master_df):
         sales_amount_tax_ex - cost_amount - operating_cost
     )
 
-    #営業利益率
-    if sales_amount_tax_ex == 0:
-        operating_profit_rate = 0
-    else:
-        operating_profit_rate = (
-            operating_profit / sales_amount_tax_ex
-        ) * 100
+    # Excel側でパーセント表示するため、比率は小数値で保持する
+    cost_rate = calculate_rate(cost_amount, sales_amount_tax_ex)
+    labor_cost_rate = calculate_rate(labor_cost_amount, sales_amount_tax_ex)
+    operating_profit_rate = calculate_rate(
+        operating_profit,
+        sales_amount_tax_ex,
+    )
 
     #客単価
     if customer_count == 0:
@@ -75,8 +85,8 @@ def aggregate_store_data(store_df, tax_rate_master_df, cost_master_df):
         "utility_cost": utility_cost,
         "other_expense_cost": other_expense_cost,
         "operating_cost": operating_cost,
-        "cost_rate": cost_rate_percent,
-        "labor_cost_rate": labor_cost_rate_percent,
+        "cost_rate": cost_rate,
+        "labor_cost_rate": labor_cost_rate,
         "operating_profit": operating_profit,
         "operating_profit_rate": operating_profit_rate,
     }
@@ -151,23 +161,16 @@ def aggregate_area_data(area_df, tax_rate_master_df, cost_master_df):
         - cost_amount
     )
 
-    #営業利益率,原価率,人件費率
-    if sales_amount_tax_ex == 0:
-        cost_rate_percent = 0
-        labor_cost_rate_percent = 0
-        operating_profit_rate = 0
-    else:
-        cost_rate_percent = (
-            cost_amount / sales_amount_tax_ex
-        ) * 100
-
-        labor_cost_rate_percent = (
-            labor_cost_amount / sales_amount_tax_ex
-        ) * 100
-
-        operating_profit_rate = (
-            operating_profit / sales_amount_tax_ex
-        ) * 100
+    # Excel側でパーセント表示するため、比率は小数値で保持する
+    cost_rate = calculate_rate(cost_amount, sales_amount_tax_ex)
+    labor_cost_rate = calculate_rate(
+        labor_cost_amount,
+        sales_amount_tax_ex,
+    )
+    operating_profit_rate = calculate_rate(
+        operating_profit,
+        sales_amount_tax_ex,
+    )
 
     area_summary = {
         "sales_amount_tax_in": sales_amount_tax_in,
@@ -183,8 +186,8 @@ def aggregate_area_data(area_df, tax_rate_master_df, cost_master_df):
         "other_expense_cost": other_expense_cost,
         "operating_cost": operating_cost,
         "operating_profit": operating_profit,
-        "cost_rate": cost_rate_percent,
-        "labor_cost_rate": labor_cost_rate_percent,
+        "cost_rate": cost_rate,
+        "labor_cost_rate": labor_cost_rate,
         "operating_profit_rate": operating_profit_rate,
     }
 
@@ -259,22 +262,16 @@ def aggregate_overall_data(area_summaries):
             sales_amount_tax_in / customer_count
         )
 
-    if sales_amount_tax_ex == 0:
-        cost_rate_percent = 0
-        labor_cost_rate_percent = 0
-        operating_profit_rate = 0
-    else:
-        cost_rate_percent = (
-            cost_amount / sales_amount_tax_ex
-        ) * 100
-
-        labor_cost_rate_percent = (
-            labor_cost_amount / sales_amount_tax_ex
-        ) * 100
-
-        operating_profit_rate = (
-            operating_profit / sales_amount_tax_ex
-        ) * 100
+    # Excel側でパーセント表示するため、比率は小数値で保持する
+    cost_rate = calculate_rate(cost_amount, sales_amount_tax_ex)
+    labor_cost_rate = calculate_rate(
+        labor_cost_amount,
+        sales_amount_tax_ex,
+    )
+    operating_profit_rate = calculate_rate(
+        operating_profit,
+        sales_amount_tax_ex,
+    )
 
     overall_summary = {
         "sales_amount_tax_in": sales_amount_tax_in,
@@ -290,8 +287,8 @@ def aggregate_overall_data(area_summaries):
         "other_expense_cost": other_expense_cost,
         "operating_cost": operating_cost,
         "operating_profit": operating_profit,
-        "cost_rate": cost_rate_percent,
-        "labor_cost_rate": labor_cost_rate_percent,
+        "cost_rate": cost_rate,
+        "labor_cost_rate": labor_cost_rate,
         "operating_profit_rate": operating_profit_rate,
     }
 

@@ -1,5 +1,20 @@
 from openpyxl import load_workbook
 
+PERCENTAGE_NUMBER_FORMAT = "0.0%"
+
+def _write_percentage_values(sheet, result):
+    """比率を小数値で書き込み、Excelのパーセント表示を設定する。"""
+    percentage_cells = {
+        "D18": result["cost_rate"],
+        "F18": result["labor_cost_rate"],
+        "B21": result["operating_profit_rate"],
+    }
+
+    for cell_address, value in percentage_cells.items():
+        sheet[cell_address] = value
+        sheet[cell_address].number_format = PERCENTAGE_NUMBER_FORMAT
+
+
 def write_overall_report(
     result,
     target_month,
@@ -36,10 +51,7 @@ def write_overall_report(
 
     # 利益・比率情報
     sheet["B18"] = result["operating_profit"]
-    sheet["D18"] = result["cost_rate"]
-    sheet["F18"] = result["labor_cost_rate"]
-
-    sheet["B21"] = result["operating_profit_rate"]
+    _write_percentage_values(sheet, result)
 
     workbook.save(output_path)
 
@@ -81,10 +93,7 @@ def write_store_report(
 
     # 利益・比率情報
     sheet["B18"] = result["operating_profit"]
-    sheet["D18"] = result["cost_rate"]
-    sheet["F18"] = result["labor_cost_rate"]
-
-    sheet["B21"] = result["operating_profit_rate"]
+    _write_percentage_values(sheet, result)
 
     workbook.save(output_path)
 
@@ -127,9 +136,6 @@ def write_area_report(
 
     # 利益・比率情報
     sheet["B18"] = result["operating_profit"]
-    sheet["D18"] = result["cost_rate"]
-    sheet["F18"] = result["labor_cost_rate"]
-
-    sheet["B21"] = result["operating_profit_rate"]
+    _write_percentage_values(sheet, result)
 
     workbook.save(output_path)
